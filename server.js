@@ -1,0 +1,63 @@
+const express = require("express");
+const bodyParser = require("body-parser");
+const axios = require("axios");
+
+const app = express();
+app.use(bodyParser.json());
+
+// ======= 你可以把所有句子放這裡 =========
+const messages = {
+  "1": [
+    "願今天的你，被理解、被接住，也被祝福。",
+    "別急，你已經比昨天更靠近光了。",
+    "願你的心被溫柔包圍，重新得力。"
+  ],
+  "2": [
+    "你的魅力比烤雞還強，這不是我說的，是老天爺說的。",
+    "今天記得笑一下，因為你笑起來比折扣還迷人。",
+    "你現在的氣質：像南瓜派剛出爐，完全無法拒絕。"
+  ],
+  "3": [
+    "願你的今天有輕鬆、有笑容、有一點小幸運。",
+    "不用太完美，你已經做得比昨天好多了。",
+    "願你在意想不到的地方，遇見祝福的門。"
+  ]
+};
+
+// ======= 接收 LINE OA 訊息 =========
+app.post("/webhook", async (req, res) => {
+  const events = req.body.events;
+
+  for (let event of events) {
+    if (event.type === "message" && event.message.type === "text") {
+      const input = event.message.text.trim();
+
+      if (messages[input]) {
+        // 隨機抽一句
+        const reply =
+          messages[input][Math.floor(Math.random() * messages[input].length)];
+
+        // 傳回 LINE
+        await axios.post(
+          "https://api.line.me/v2/bot/message/reply",
+          {
+            replyToken: event.replyToken,
+            messages: [{ type: "text", text: reply }]
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${process.env.CHANNEL_ACCESS_TOKEN}`
+            }
+          }
+        );
+      }
+    }
+  }
+
+  res.sendStatus(200);
+});
+
+// =================================
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Your random reply server is runnin

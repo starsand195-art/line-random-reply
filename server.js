@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const app = express();
 app.use(bodyParser.json());
 
-// 測試 GET（讓 Verify 不 404）
+// 測試 GET (避免 404)
 app.get("/", (req, res) => {
   res.send("Server is running.");
 });
@@ -15,7 +15,8 @@ app.post("/webhook", (req, res) => {
   res.status(200).send("OK");
 });
 
+// Render 必須使用的 PORT
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
-  console.log("Server started on port " + port);
+  console.log("Your random reply server is running on port " + port);
 });
